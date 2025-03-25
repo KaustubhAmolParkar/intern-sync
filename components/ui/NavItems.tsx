@@ -119,19 +119,21 @@ const NavItems = ({
         <ul className="flex flex-col gap-1">
           {menuitems.map((item) => {
             if (item.access.includes(role)) {
-              // Determine what to render
               let IconComponent;
-              if (typeof item.icon === 'string') {
-                const iconSrc =
-                  resolvedTheme === 'dark' ? item.iconDark : item.iconLight;
-                IconComponent = (
-                  <img src={iconSrc} alt={item.title} className="h-5 w-5" />
-                );
-              } else {
-                IconComponent = (
-                  <item.icon className="h-5 w-5" strokeWidth={1.5} />
-                );
-              }
+                  if (!mounted) {
+                    IconComponent = <Skeleton className="h-5 w-5" />;
+                  } else if (typeof item.icon === 'string') {
+                    const iconSrc =
+                      resolvedTheme === 'dark' ? item.iconDark : item.iconLight;
+                    IconComponent = (
+                      <img src={iconSrc} alt={item.title} className="h-5 w-5" />
+                    );
+                  } else {
+                    IconComponent = (
+                      <item.icon className="h-5 w-5" strokeWidth={1.5} />
+                    );
+                  }
+
               return (
                 <li
                   key={item.path}
