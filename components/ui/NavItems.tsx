@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import { useUser } from '@/context/UserContext';
@@ -8,6 +9,8 @@ import {
   LogOutIcon,
   Settings2Icon,
   SunMoonIcon,
+  UserCog,
+  ScrollText,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -23,6 +26,7 @@ const NavItems = ({
   setSheetOpen?: (open: boolean) => void;
 }) => {
   const { roles } = useUser();
+  const { resolvedTheme } = useTheme();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -37,6 +41,9 @@ const NavItems = ({
     {
       path: `/dashboard/${role}`,
       title: 'Home',
+      icon: '/home.svg',
+      iconLight: '/home.svg',
+      iconDark: '/home-dark.svg',
       access: [
         'institute-coordinator',
         'department-coordinator',
@@ -48,16 +55,25 @@ const NavItems = ({
     {
       path: `/dashboard/${role}/departments`,
       title: 'Departments',
+      icon: '/department.svg',
+      iconLight: '/department.svg',
+      iconDark: '/department-dark.svg',
       access: ['institute-coordinator'],
     },
     {
       path: `/dashboard/${role}/college-mentors`,
       title: 'College Mentors',
+      icon: '/collegeMentor.svg',
+      iconLight: '/collegeMentor.svg',
+      iconDark: '/collegeMentor-dark.svg',
       access: ['institute-coordinator', 'department-coordinator'],
     },
     {
       path: `/dashboard/${role}/students`,
       title: 'Students',
+      icon: '/student.svg',
+      iconLight: '/student.svg',
+      iconDark: '/student-dark.svg',
       access: [
         'institute-coordinator',
         'department-coordinator',
@@ -67,16 +83,23 @@ const NavItems = ({
     {
       path: `/dashboard/${role}/internships`,
       title: 'Internships',
+      icon: '/internship.svg',
+      iconLight: '/internship.svg',
+      iconDark: '/internship-dark.svg',
       access: ['department-coordinator', 'college-mentor', 'student'],
     },
     {
       path: `/dashboard/${role}/attendance`,
       title: 'Attendance',
+      icon: '/attendance.svg',
+      iconLight: '/attendance.svg',
+      iconDark: '/attendance-dark.svg',
       access: ['college-mentor', 'company-mentor', 'department-coordinator'],
     },
     {
       path: `/dashboard/${role}/reports`,
       title: 'Reports',
+      icon: ScrollText,
       access: [
         'college-mentor',
         'company-mentor',
@@ -96,6 +119,19 @@ const NavItems = ({
         <ul className="flex flex-col gap-1">
           {menuitems.map((item) => {
             if (item.access.includes(role)) {
+              // Determine what to render
+              let IconComponent;
+              if (typeof item.icon === 'string') {
+                const iconSrc =
+                  resolvedTheme === 'dark' ? item.iconDark : item.iconLight;
+                IconComponent = (
+                  <img src={iconSrc} alt={item.title} className="h-5 w-5" />
+                );
+              } else {
+                IconComponent = (
+                  <item.icon className="h-5 w-5" strokeWidth={1.5} />
+                );
+              }
               return (
                 <li
                   key={item.path}
@@ -111,10 +147,10 @@ const NavItems = ({
                       (pathname === item.path ||
                         (item.path !== `/dashboard/${role}` &&
                           pathname.startsWith(item.path))) &&
-                      'text-primary lg:bg-secondary'
+                      'text-primary'
                     }`}
                   >
-                    <DotIcon strokeWidth={6} />
+                    {IconComponent}
                     {item.title}
                   </Link>
                 </li>
@@ -142,7 +178,7 @@ const NavItems = ({
                 pathname === `/dashboard/${role}/profile` && 'text-primary'
               }`}
             >
-              <DotIcon strokeWidth={6} />
+              <UserCog strokeWidth={1.5} />
               Profile
             </Link>
           </li>
@@ -160,7 +196,19 @@ const NavItems = ({
                   pathname === '/dashboard' && 'text-primary'
                 }`}
               >
-                <DotIcon strokeWidth={6} />
+                {mounted ? (
+                  <img
+                    src={
+                      resolvedTheme === 'dark'
+                        ? '/switch-dark.svg'
+                        : '/switch.svg'
+                    }
+                    alt="Switch Roles"
+                    className="h-5 w-5"
+                  />
+                ) : (
+                  <Skeleton className="h-5 w-5" />
+                )}
                 Switch role
               </Link>
             </li>
