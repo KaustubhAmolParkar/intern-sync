@@ -8,7 +8,16 @@ import {
   LogOutIcon,
   Settings2Icon,
   SunMoonIcon,
+  UserCog,
+  ScrollText,
+  Building2,
 } from 'lucide-react';
+import HomeIcon  from '@/components/icons/HomeIcon';
+import AttendanceIcon from '@/components/icons/AttendanceIcon';
+import InternshipsIcon from '@/components/icons/InternshipsIcon';
+import StudentIcon from '@/components/icons/StudentIcon';
+import SwitchIcon from '@/components/icons/SwitchIcon';
+import CollegeMentorIcon from '@/components/icons/CollegeMentorIcon'
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -37,6 +46,7 @@ const NavItems = ({
     {
       path: `/dashboard/${role}`,
       title: 'Home',
+      icon: HomeIcon,
       access: [
         'institute-coordinator',
         'department-coordinator',
@@ -48,16 +58,19 @@ const NavItems = ({
     {
       path: `/dashboard/${role}/departments`,
       title: 'Departments',
+      icon: Building2,
       access: ['institute-coordinator'],
     },
     {
-      path: `/dashboard/${role}/college-mentors`,
+      path: '/dashboard/${role}/college-mentors',
       title: 'College Mentors',
+      icon: CollegeMentorIcon,
       access: ['institute-coordinator', 'department-coordinator'],
     },
     {
       path: `/dashboard/${role}/students`,
       title: 'Students',
+      icon: StudentIcon,
       access: [
         'institute-coordinator',
         'department-coordinator',
@@ -67,29 +80,27 @@ const NavItems = ({
     {
       path: `/dashboard/${role}/internships`,
       title: 'Internships',
+      icon: InternshipsIcon,
       access: ['department-coordinator', 'college-mentor', 'student'],
     },
     {
-      path: `/dashboard/${role}/attendance`,
+      path: '/dashboard/${role}/attendance',
       title: 'Attendance',
+      icon: AttendanceIcon,
       access: ['college-mentor', 'company-mentor', 'department-coordinator'],
     },
     {
       path: `/dashboard/${role}/reports`,
       title: 'Reports',
+      icon: ScrollText,
       access: [
         'college-mentor',
         'company-mentor',
         'department-coordinator',
         'student',
-      ],
-    },
-    {
-      path: `/dashboard/${role}/evaluations`,
-      title: 'Evaluations',
-      access: ['department-coordinator', 'college-mentor', 'student'],
-    },
-  ];
+      ],
+    },
+  ];
 
   return (
     <div className="mt-3 lg:mt-7 lg:mb-4 flex flex-col gap-4 flex-grow overflow-auto">
@@ -113,13 +124,10 @@ const NavItems = ({
                   <Link
                     href={item.path}
                     className={`flex gap-2 w-full p-2 rounded-lg hover:text-primary ${
-                      (pathname === item.path ||
-                        (item.path !== `/dashboard/${role}` &&
-                          pathname.startsWith(item.path))) &&
-                      'text-primary lg:bg-secondary'
+                      pathname === item.path ? 'text-primary lg:bg-secondary' : ''
                     }`}
                   >
-                    <DotIcon strokeWidth={6} />
+                    <item.icon className="h-5 w-5" strokeWidth={1.5}/>
                     {item.title}
                   </Link>
                 </li>
@@ -147,7 +155,7 @@ const NavItems = ({
                 pathname === `/dashboard/${role}/profile` && 'text-primary'
               }`}
             >
-              <DotIcon strokeWidth={6} />
+              <UserCog strokeWidth={1.5} />
               Profile
             </Link>
           </li>
@@ -165,7 +173,7 @@ const NavItems = ({
                   pathname === '/dashboard' && 'text-primary'
                 }`}
               >
-                <DotIcon strokeWidth={6} />
+                <SwitchIcon strokeWidth={1.5} />
                 Switch role
               </Link>
             </li>
