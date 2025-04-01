@@ -1,6 +1,6 @@
 'use client';
 
-import getStudentColumns from '@/app/dashboard/(roles)/institute-coordinator/students/studentColumns';
+import getEvaluationColumns from '@/app/dashboard/(roles)/department-coordinator/evaluations/evaluationColumns';
 import { Card } from '@/components/ui/card';
 import { Loader } from '@/components/ui/Loader';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,12 +9,11 @@ import TablePagination from '@/components/ui/TablePagination';
 import TableSearch from '@/components/ui/TableSearch';
 import { useUser } from '@/context/UserContext';
 import {
-  useChangeCollegeMentor,
-  useDeleteStudent,
-  useSendStudentInvite,
-} from '@/services/mutations/students';
-import { useStudents } from '@/services/queries';
-import Student from '@/types/students';
+  useUpdateEvaluation,
+  useDeleteEvaluation,
+} from '@/services/mutations/evaluations';
+import { useEvaluations } from '@/services/queries';
+import Evaluations from '@/types/evaluations';
 import {
   SortingState,
   getCoreRowModel,
@@ -25,7 +24,7 @@ import {
 } from '@tanstack/react-table';
 import { useEffect, useMemo, useState } from 'react';
 
-const StudentsTable = () => {
+const EvaluationsTable = () => {
   const { user, instituteId } = useUser();
   const [mounted, setMounted] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -35,50 +34,50 @@ const StudentsTable = () => {
     setMounted(true);
   }, []);
 
-  const { data: students, isLoading } = useStudents({
+  const { data: evaluations, isLoading } = useEvaluations({
     instituteId,
+    departmentId: user?.uid,
   });
 
-  const { deleteStudent } = useDeleteStudent({
+  const { deleteEvaluation } = useDeleteEvaluation({
     instituteId: instituteId!,
-    requestingUserId: user?.uid!,
+    departmentId: user?.uid,
   });
-  const { sendInvite } = useSendStudentInvite({ instituteId: instituteId! });
-  const { changeCollegeMentor } = useChangeCollegeMentor({
+  const { updateEvaluation } = useUpdateEvaluation({
     instituteId: instituteId!,
+    departmentId: user?.uid,
   });
 
-  const studentColumns = useMemo(
+  const evaluationColumns = useMemo(
     () =>
-      getStudentColumns({
-        onDelete: deleteStudent,
-        onSendInvite: sendInvite,
-        onChangeCollegeMentor: changeCollegeMentor,
-        dashboardRole: 'institute-coordinator',
+      getEvaluationColumns({
+        onDelete: deleteEvaluation,
+        onUpdate: updateEvaluation,
+        dashboardRole: 'department-coordinator',
       }),
-    [deleteStudent, sendInvite, changeCollegeMentor]
+    [deleteEvaluation, updateEvaluation]
   );
 
   const tableData = useMemo(
-    () => (isLoading ? Array(10).fill({}) : students),
-    [isLoading, students]
+    () => (isLoading ? Array(10).fill({}) : evaluations),
+    [isLoading, evaluations]
   );
 
   const tableColumns = useMemo(
     () =>
       isLoading
-        ? studentColumns.map((column, index) => ({
+        ? evaluationColumns.map((column, index) => ({
             ...column,
             cell: () => (
               <Skeleton key={`loading-cell-${index}`} className="h-8 rounded" />
             ),
           }))
-        : studentColumns,
-    [isLoading, studentColumns]
+        : evaluationColumns,
+    [isLoading, evaluationColumns]
   );
 
   const table = useReactTable({
-    data: tableData as Student[],
+    data: tableData as Evaluations[],
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -106,25 +105,21 @@ const StudentsTable = () => {
         <Skeleton className="h-10 max-w-xs rounded-md" />
       ) : (
         mounted && (
-          <TableSearch
-            table={table}
-            placeholder="Search Student"
-            column="users.name"
-          />
+          <TableSearch table={table} placeholder="Search Name" column="name" />
         )
       )}
       {mounted && (
-        <TableContent<Student>
+        <TableContent<Evaluations>
           table={table}
           isLoading={isLoading}
           mounted={mounted}
-          tableData={students}
+          tableData={evaluations}
           tableColumns={tableColumns}
         />
       )}
-      {students && <TablePagination table={table} />}
+      {evaluations && <TablePagination table={table} />}
     </Card>
   );
 };
 
-export default StudentsTable;
+export default EvaluationsTable;
